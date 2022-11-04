@@ -4,6 +4,7 @@ using UnityEngine;
 public class RoomData : ScriptableObject
 {
     public GameObject room;
-    public Vector2Int minPosition;
-    public Vector2Int maxPosition;
+    public Vector2Int size;
+    public int startPos;
+    public Vector2 offset;
 }
