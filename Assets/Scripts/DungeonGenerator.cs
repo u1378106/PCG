@@ -9,7 +9,7 @@ public class DungeonGenerator : MonoBehaviour
     public Vector3 startPoint;
     public Vector3 endPoint;
     public int roomCount;
-
+    public int roomCounter;
     public bool isMazeDone;
 
     public class Cell
@@ -18,18 +18,8 @@ public class DungeonGenerator : MonoBehaviour
         public bool[] status = new bool[4];
     }
 
-    //[System.Serializable]
-    //public class Rule
-    //{
-        //public GameObject room;
-        //public Vector2Int minPosition;
-        //public Vector2Int maxPosition;
-
-        //public bool obligatory;
-
         public int ProbabilityOfSpawning(int x, int y, int index)
         {
-            // 0 - cannot spawn 1 - can spawn 2 - HAS to spawn
 
             if (x >= rooms[index].minPosition.x && x <= rooms[index].maxPosition.x && y >= rooms[index].minPosition.y && y <= rooms[index].maxPosition.y)
             {
@@ -50,12 +40,13 @@ public class DungeonGenerator : MonoBehaviour
 
     // Start is called before the first frame update
     public void StartMazeGeneration()
-    {
-        startPoint = new Vector3(2, 1, 2);
-        Camera.main.transform.position = startPoint;
+    {       
         MazeGenerator();
+        startPoint = transform.GetChild(0).GetChild(5).transform.position;
+        Camera.main.transform.position = startPoint;
         roomCount = transform.childCount;
-        endPoint = transform.GetChild(roomCount - 1).transform.position;       
+        endPoint = transform.GetChild(roomCount - 1).transform.position;
+        roomCounter++;
     }
 
     void GenerateDungeon()
