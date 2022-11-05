@@ -4,46 +4,58 @@ using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
+    public RoomData[] rooms;
+
+    public Vector3 startPoint;
+    public Vector3 endPoint;
+    public int roomCount;
+
+    public bool isMazeDone;
+
     public class Cell
     {
         public bool visited = false;
         public bool[] status = new bool[4];
     }
 
-    [System.Serializable]
-    public class Rule
-    {
-        public GameObject room;
-        public Vector2Int minPosition;
-        public Vector2Int maxPosition;
+    //[System.Serializable]
+    //public class Rule
+    //{
+        //public GameObject room;
+        //public Vector2Int minPosition;
+        //public Vector2Int maxPosition;
 
-        public bool obligatory;
+        //public bool obligatory;
 
-        public int ProbabilityOfSpawning(int x, int y)
+        public int ProbabilityOfSpawning(int x, int y, int index)
         {
             // 0 - cannot spawn 1 - can spawn 2 - HAS to spawn
 
-            if (x >= minPosition.x && x <= maxPosition.x && y >= minPosition.y && y <= maxPosition.y)
+            if (x >= rooms[index].minPosition.x && x <= rooms[index].maxPosition.x && y >= rooms[index].minPosition.y && y <= rooms[index].maxPosition.y)
             {
-                return obligatory ? 2 : 1;
+                return rooms[index].obligatory ? 2 : 1;
             }
 
             return 0;
         }
 
-    }
+    //}
 
     public Vector2Int size;
     public int startPos = 0;
-    public Rule[] rooms;
+    //public Rule[] rooms;
     public Vector2 offset;
 
     List<Cell> board;
 
     // Start is called before the first frame update
-    void Start()
+    public void StartMazeGeneration()
     {
+        startPoint = new Vector3(2, 1, 2);
+        Camera.main.transform.position = startPoint;
         MazeGenerator();
+        roomCount = transform.childCount;
+        endPoint = transform.GetChild(roomCount - 1).transform.position;       
     }
 
     void GenerateDungeon()
@@ -61,7 +73,7 @@ public class DungeonGenerator : MonoBehaviour
 
                     for (int k = 0; k < rooms.Length; k++)
                     {
-                        int p = rooms[k].ProbabilityOfSpawning(i, j);
+                        int p = ProbabilityOfSpawning(i, j, k);
 
                         if (p == 2)
                         {
@@ -93,7 +105,7 @@ public class DungeonGenerator : MonoBehaviour
                 }
             }
         }
-
+        isMazeDone = true;
     }
 
     void MazeGenerator()
