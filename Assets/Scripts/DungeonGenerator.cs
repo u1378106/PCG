@@ -1,16 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class DungeonGenerator : MonoBehaviour
 {
     public RoomData[] rooms;
+    RoomData dungeonToLoad;
 
     public Vector3 startPoint;
     public Vector3 endPoint;
     public int roomCount;
-    public int roomCounter;
+    public int dungoenCounter;
     public bool isMazeDone;
+    List<RoomData> dungoens = new List<RoomData>();
+    private GameObject dungeonName;
+    public GameObject dungeonNamePrefab;
 
     public class Cell
     {
@@ -29,37 +34,60 @@ public class DungeonGenerator : MonoBehaviour
             return 0;
         }
 
-    //}
-
     public Vector2Int size;
     public int startPos = 0;
-    //public Rule[] rooms;
     public Vector2 offset;
 
     List<Cell> board;
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        for (int i = 1; i < 4; i++)
+        {
+            dungoens.Add((RoomData)(Resources.Load("RoomObjects/NewRoom" + i)));
+        }
+
+        RandomDungeon();
+    }
+
+    public void RandomDungeon()
+    {
+
+        dungeonToLoad = dungoens[Random.Range(0, dungoens.Count)];
+    }
+
+
     public void StartMazeGeneration()
-    {       
+    {
+        if (transform.childCount != 0)
+        {
+            foreach (Transform cell in transform)
+            {
+                Destroy(cell.gameObject);
+            }
+        }
         MazeGenerator();
+
         startPoint = transform.GetChild(0).GetChild(5).transform.position;
         Camera.main.transform.position = startPoint;
         roomCount = transform.childCount;
-        endPoint = transform.GetChild(roomCount - 1).transform.position;
-        roomCounter++;
+        endPoint = transform.GetChild(roomCount - 1).GetChild(5).transform.position;
+        dungoenCounter++;
+        dungeonName = GameObject.Instantiate(dungeonNamePrefab, startPoint, Quaternion.identity);
+        dungeonName.transform.GetChild(0).transform.position = startPoint;
+        dungeonName.GetComponentInChildren<TextMeshProUGUI>().text = "Dungeon " + dungoenCounter;
     }
 
     void GenerateDungeon()
     {
-
         for (int i = 0; i < size.x; i++)
         {
             for (int j = 0; j < size.y; j++)
             {
                 Cell currentCell = board[(i + j * size.x)];
                 if (currentCell.visited)
-                {
-                    int randomRoom = -1;
+                {                
                     List<int> availableRooms = new List<int>();
 
                     for (int k = 0; k < rooms.Length; k++)
@@ -67,8 +95,7 @@ public class DungeonGenerator : MonoBehaviour
                         int p = ProbabilityOfSpawning(i, j, k);
 
                         if (p == 2)
-                        {
-                            randomRoom = k;
+                        {                          
                             break;
                         }
                         else if (p == 1)
@@ -77,19 +104,13 @@ public class DungeonGenerator : MonoBehaviour
                         }
                     }
 
-                    if (randomRoom == -1)
-                    {
-                        if (availableRooms.Count > 0)
-                        {
-                            randomRoom = availableRooms[Random.Range(0, availableRooms.Count)];
-                        }
-                        else
-                        {
-                            randomRoom = 0;
-                        }
-                    }
-                   
-                    var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
+                    if (dungeonToLoad.name == "NewRoom1")                  
+                        offset = new Vector2(8, 8);
+                    else if (dungeonToLoad.name == "NewRoom2")
+                        offset = new Vector2(4, 4);
+                    else
+                        offset = new Vector2(5.5f, 5.5f);
+                    var newRoom = Instantiate(dungeonToLoad.room, new Vector3(i * offset.x, 0, -j * offset.y), Quaternion.identity, transform).GetComponent<RoomBehaviour>();
                     newRoom.UpdateRoom(currentCell.status);
                     newRoom.name += " " + i + "-" + j;
 

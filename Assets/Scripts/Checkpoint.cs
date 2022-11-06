@@ -6,19 +6,37 @@ public class Checkpoint : MonoBehaviour
 {
     DungeonGenerator dungeonGenerator;
 
-    public RoomData nextDungeon;
+    Fading fading;
+
+    
 
     private void Start()
     {
         dungeonGenerator = GameObject.FindObjectOfType<DungeonGenerator>();
+        fading = GameObject.FindObjectOfType<Fading>();     
     }
 
     private void OnCollisionEnter(Collision other)
     {
         if(other.gameObject.tag.Equals("MainCamera"))
         {
-            dungeonGenerator.rooms[0] = (RoomData)(Resources.Load("RoomObjects/Room2"));
-            dungeonGenerator.StartMazeGeneration();
+            this.gameObject.GetComponent<BoxCollider>().enabled = false;
+            StartCoroutine(RoomGeneration());          
         }
+    }
+
+    IEnumerator RoomGeneration()
+    {      
+        fading.HandleFade();
+        fading.isFaded = true;
+
+        yield return new WaitForSeconds(1f);
+        dungeonGenerator.RandomDungeon();
+        fading.HandleFade();
+        fading.isFaded = false;
+
+        dungeonGenerator.StartMazeGeneration();
+        this.transform.position = dungeonGenerator.endPoint;
+        this.gameObject.GetComponent<BoxCollider>().enabled = true;
     }
 }
