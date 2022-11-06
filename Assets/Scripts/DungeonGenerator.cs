@@ -40,7 +40,7 @@ public class DungeonGenerator : MonoBehaviour
 
     List<Cell> board;
 
-    // Start is called before the first frame update
+ 
     private void Awake()
     {
         for (int i = 1; i < 4; i++)
@@ -74,6 +74,7 @@ public class DungeonGenerator : MonoBehaviour
         roomCount = transform.childCount;
         endPoint = transform.GetChild(roomCount - 1).GetChild(5).transform.position;
         dungoenCounter++;
+        Destroy(dungeonName);
         dungeonName = GameObject.Instantiate(dungeonNamePrefab, startPoint, Quaternion.identity);
         dungeonName.transform.GetChild(0).transform.position = startPoint;
         dungeonName.GetComponentInChildren<TextMeshProUGUI>().text = "Dungeon " + dungoenCounter;
